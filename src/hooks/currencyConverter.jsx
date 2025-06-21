@@ -1,15 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 
-const currencyConverter = (currency = "INR") => {
+const useCurrencyConverter = (fromCurrency = "USD", toCurrency = "INR") => {
   const [rate, setRate] = useState();
 
-  useEffect(()=>{
-    fetch(`https://api.frankfurter.app/latest?from=USD&to=${currency}`)
+  useEffect(() => {
+    if (fromCurrency === toCurrency) {
+      setRate(1);
+      return;
+    }
+
+    fetch(
+      `https://api.frankfurter.app/latest?from=${fromCurrency}&to=${toCurrency}`
+    )
       .then((res) => res.json())
-      .then((data) => setRate(data.rates[currency])),}
-    [currency]
-  );
+      .then((data) => {
+        console.log("data", data);
+        setRate(data.rates[toCurrency]);
+      })
+      .catch((err) => {
+        console.error("Error Ocurred", err);
+        setRate(null);
+      });
+  }, [fromCurrency]);
+
   return rate;
 };
 
-export default currencyConverter;
+export default useCurrencyConverter;
